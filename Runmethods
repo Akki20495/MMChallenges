@@ -1,0 +1,48 @@
+To run a different method within a Java class from the command line, you can create a custom command-line interface (CLI) for your application and specify which method to run as a command-line argument. This allows you to execute different methods within your application without modifying the source code. Here's how to achieve this:
+
+1. Modify your code to accept command-line arguments: You will need to modify your Java class to accept command-line arguments that specify the method you want to run. You can use the `args` parameter in the `main` method to retrieve command-line arguments.
+
+```java
+public class MyClass {
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Usage: java MyClass methodName [arg1 arg2 ...]");
+            return;
+        }
+
+        String methodName = args[0];
+
+        if ("method1".equals(methodName)) {
+            method1();
+        } else if ("method2".equals(methodName)) {
+            method2();
+        } else {
+            System.out.println("Invalid method name: " + methodName);
+        }
+    }
+
+    public static void method1() {
+        System.out.println("Running method1");
+        // Add method1 logic here
+    }
+
+    public static void method2() {
+        System.out.println("Running method2");
+        // Add method2 logic here
+    }
+}
+```
+
+In this modified code, the `main` method checks the command-line arguments. If you provide "method1" as the first argument when running the JAR file, it will call `method1`. If you provide "method2," it will call `method2`.
+
+2. Compile and package your Java class into a JAR file as usual.
+
+3. Run the JAR file and specify the method to execute:
+
+```bash
+java -cp path/to/your-jar.jar org.example.MyClass method1
+```
+
+Replace `path/to/your-jar.jar` with the actual path to your JAR file. You can specify the method you want to run as the second argument.
+
+Using this approach, you can run different methods within your Java class by specifying the method name as a command-line argument when you execute the JAR file. This provides flexibility without modifying the source code of the class.
