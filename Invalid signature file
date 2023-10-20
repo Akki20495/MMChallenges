@@ -1,0 +1,47 @@
+The error message "Invalid signature file digest for Manifest main attributes" typically indicates an issue with the digital signatures in the JAR file's manifest. This error is often encountered when dealing with signed JAR files, such as those used in Java Web Start applications or applets. It can occur when the JAR file has been modified in a way that breaks the digital signature integrity.
+(OR) [WARNING] Discovered module-info.class. Shading will break its strong encapsulation.
+
+Here are some common reasons for this error and how to resolve it:
+
+1. **Modification of Signed JAR**: If a signed JAR file is modified (e.g., you added or removed files), it can break the digital signature. To resolve this, you can either re-sign the JAR file or use an unsigned version of the JAR if it's acceptable for your use case.
+
+2. **Maven Shade Plugin**: If you're using the Maven Shade Plugin to create an Uber JAR and encounter this error, it could be because the plugin doesn't handle signed JARs well. You may want to exclude signed JARs from the shading process. Here's an example of how to do this in your `pom.xml`:
+
+   ```xml
+ <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.2.1</version>
+    <configuration>
+        <filters>
+            <filter>
+                <artifact>*:*</artifact>
+                <excludes>
+                    <exclude>module-info.class</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                </excludes>
+            </filter>
+        </filters>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+   ```
+
+   Replace `your.signed:jar` with the actual coordinates of the signed JAR.
+
+3. **Unsigned JAR**: If you don't need the digital signature for your JAR file, you can remove it by using an unsigned version of the JAR.
+
+4. **Check for File Corruption**: Ensure that the JAR file itself is not corrupted. You can try re-downloading the JAR from a trusted source.
+
+5. **Verify the Signing Process**: If you are in control of the signing process, ensure that the JAR is signed correctly using trusted certificates.
+
+If you are working with a signed JAR for a specific application or distribution, it's essential to handle the JAR file carefully to maintain the integrity of the digital signature. Additionally, make sure that all the steps involved in the build process, including any plugins or tools, are compatible with signed JARs to avoid introducing issues with the signature.
