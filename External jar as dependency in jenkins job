@@ -1,4 +1,4 @@
-To use an external JAR file in a Jenkins job, you can follow these steps:
+To use an external JAR file as a dependency in a Jenkins job, you can follow these steps:
 
 1. **Install and Configure Jenkins:** If you haven't already, install Jenkins on your server and set it up according to your requirements.
 
@@ -8,12 +8,17 @@ To use an external JAR file in a Jenkins job, you can follow these steps:
 
 3. **Configure the Job:**
    - In the job configuration, look for the "Build" section or the appropriate section where you can add build steps.
-   - Depending on your use case, you can use different build steps. For example:
-     - **Execute Shell:** If you're using a Unix-like system, you can add a shell script to execute your JAR file. Make sure to provide the correct path to the JAR file.
-     - **Execute Windows batch command:** If you're using Windows, you can add a batch script to run your JAR file.
+   - Depending on your use case, you can use different build steps. To use an external JAR as a dependency, you can add a "Execute Shell" (for Unix-like systems) or "Execute Windows batch command" (for Windows) build step.
 
-4. **Add the JAR File:** Make sure the JAR file is available in the workspace or provide its full path in the build step.
+4. **Copy the External JAR to the Workspace:**
+   - In your build step script, you can use commands to copy the external JAR to the workspace directory of your Jenkins job. For example, you can use `cp` or `copy` commands.
+   - Here's an example for Unix-like systems:
+     ```bash
+     cp /path/to/your/external.jar $WORKSPACE/
+     ```
 
-5. **Save and Build:** Save the job configuration and trigger a build to run the JAR file as part of the Jenkins job.
+5. **Use the JAR as a Dependency:** Now that the JAR is in your job's workspace, you can reference it in your build process. You might use it in your build commands, for example, to run a Java application with the JAR as a dependency.
 
-Remember to configure your Jenkins job and workspace appropriately, and ensure that any external dependencies required by the JAR file are available. You can also consider using Jenkins plugins like the "Copy Artifact" plugin to manage dependencies and artifacts more efficiently.
+6. **Save and Build:** Save the job configuration, and trigger a build to use the external JAR as a dependency.
+
+This approach assumes you want to use the external JAR within the context of the Jenkins job. If you need the JAR as a dependency for your build and don't want to copy it to the workspace, you can consider using a build tool like Apache Maven or Gradle, which can handle dependency management more systematically. Jenkins also has plugins for these build tools that can simplify the process.
