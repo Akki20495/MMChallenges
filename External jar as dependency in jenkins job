@@ -1,0 +1,19 @@
+To use an external JAR file in a Jenkins job, you can follow these steps:
+
+1. **Install and Configure Jenkins:** If you haven't already, install Jenkins on your server and set it up according to your requirements.
+
+2. **Create a Jenkins Job:**
+   - Go to your Jenkins dashboard.
+   - Click on "New Item" to create a new job (Freestyle project, Pipeline, etc.) based on your requirements.
+
+3. **Configure the Job:**
+   - In the job configuration, look for the "Build" section or the appropriate section where you can add build steps.
+   - Depending on your use case, you can use different build steps. For example:
+     - **Execute Shell:** If you're using a Unix-like system, you can add a shell script to execute your JAR file. Make sure to provide the correct path to the JAR file.
+     - **Execute Windows batch command:** If you're using Windows, you can add a batch script to run your JAR file.
+
+4. **Add the JAR File:** Make sure the JAR file is available in the workspace or provide its full path in the build step.
+
+5. **Save and Build:** Save the job configuration and trigger a build to run the JAR file as part of the Jenkins job.
+
+Remember to configure your Jenkins job and workspace appropriately, and ensure that any external dependencies required by the JAR file are available. You can also consider using Jenkins plugins like the "Copy Artifact" plugin to manage dependencies and artifacts more efficiently.
