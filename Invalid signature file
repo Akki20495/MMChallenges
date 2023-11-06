@@ -45,3 +45,25 @@ Here are some common reasons for this error and how to resolve it:
 5. **Verify the Signing Process**: If you are in control of the signing process, ensure that the JAR is signed correctly using trusted certificates.
 
 If you are working with a signed JAR for a specific application or distribution, it's essential to handle the JAR file carefully to maintain the integrity of the digital signature. Additionally, make sure that all the steps involved in the build process, including any plugins or tools, are compatible with signed JARs to avoid introducing issues with the signature.
+         OR
+<build>
+    <plugins>
+      <!-- any other plugins -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
