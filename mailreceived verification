@@ -1,0 +1,47 @@
+import java.util.Properties;
+import javax.mail.*;
+
+public class EmailVerification {
+
+    public static void verifyEmail(String host, String username, String password, String expectedSender) {
+        Properties properties = new Properties();
+        properties.setProperty("mail.store.protocol", "imaps");
+
+        try {
+            Session session = Session.getInstance(properties, null);
+            Store store = session.getStore();
+            store.connect(host, username, password);
+
+            Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
+
+            Message[] messages = inbox.getMessages();
+
+            for (Message message : messages) {
+                String from = InternetAddress.toString(message.getFrom());
+
+                if (from.contains(expectedSender)) {
+                    System.out.println("Email received from: " + expectedSender);
+                    // Perform further actions or verification logic as needed
+                } else {
+                    System.out.println("Email not received from: " + expectedSender);
+                }
+            }
+
+            inbox.close(true);
+            store.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        String host = "imap.gmail.com"; // Replace with your email provider's IMAP server
+        String username = "your-email@gmail.com"; // Replace with your email address
+        String password = "your-password"; // Replace with your email password
+        String expectedSender = "sender@example.com"; // Replace with the expected sender's email address
+
+        verifyEmail(host, username, password, expectedSender);
+    }
+}
