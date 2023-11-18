@@ -1,0 +1,8 @@
+The IFSC (Indian Financial System Code) is an 11-character alphanumeric code used to uniquely identify bank branches
+ within the National Electronic Funds Transfer (NEFT) network in India. The structure of the IFSC code is as follows:
+
+1. The first four characters represent the bank code.
+2. The fifth character is always "0" (zero).
+3. The last six characters uniquely identify the specific branch of the bank.
+
+So, the total length of an IFSC code is 11 characters. For example, an IFSC code might look like this: "ABCD0123456". In this example, "ABCD" is the bank code, "0" is the fifth character, and "123456" uniquely identifies the branch.
