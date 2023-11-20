@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Parallel Execution') {
+            parallel {
+                stage('Node 1') {
+                    steps {
+                        echo 'Executing on Node 1'
+                        // Add your commands for Node 1 here
+                    }
+                }
+
+                stage('Node 2') {
+                    steps {
+                        echo 'Executing on Node 2'
+                        // Add your commands for Node 2 here
+                    }
+                }
+
+                // Add more parallel stages as needed
+            }
+        }
+    }
+}
