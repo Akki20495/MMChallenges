@@ -1,0 +1,34 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.Set;
+
+public class SwitchToDefaultTabExample {
+    public static void main(String[] args) {
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        // Create a new instance of the ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Navigate to a web page that opens multiple tabs
+        driver.get("https://example.com");
+
+        // Perform some actions that might open new tabs...
+
+        // Get the handle of the default/main window
+        String mainWindowHandle = driver.getWindowHandle();
+
+        // Perform actions in the new tabs...
+
+        // Switch back to the default/main window
+        driver.switchTo().window(mainWindowHandle);
+
+        // Continue with actions on the main window...
+
+        // Close the browser
+        driver.quit();
+    }
+}
