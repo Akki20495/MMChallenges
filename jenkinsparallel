@@ -1,0 +1,29 @@
+pipeline {
+    agent none
+    
+    stages {
+        stage('Parallel Execution') {
+            parallel {
+                stage('Node 1') {
+                    agent {
+                        label 'node-1' // Specify the label for Node 1
+                    }
+                    steps {
+                        echo 'Running on Node 1'
+                        // Add your Node 1 specific steps here
+                    }
+                }
+
+                stage('Node 2') {
+                    agent {
+                        label 'node-2' // Specify the label for Node 2
+                    }
+                    steps {
+                        echo 'Running on Node 2'
+                        // Add your Node 2 specific steps here
+                    }
+                }
+            }
+        }
+    }
+}
