@@ -1,0 +1,35 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class WebPageScreenshot {
+
+    public static void main(String[] args) {
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        // Initialize the ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Open the webpage you want to capture
+        driver.get("https://example.com");
+
+        // Maximize the browser window to capture the full page
+        driver.manage().window().maximize();
+
+        // Take a screenshot of the full webpage
+        org.openqa.selenium.Dimension size = driver.manage().window().getSize();
+        org.openqa.selenium.Point position = driver.manage().window().getPosition();
+
+        org.openqa.selenium.Screenshot screenshot = ((ChromeDriver) driver).getScreenshotAs(org.openqa.selenium.OutputType.FILE);
+        File screenshotFile = new File("full_page_screenshot.png");
+        try {
+            FileUtils.copyFile(screenshot, screenshotFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Close the browser
+        driver.quit();
+    }
+}
