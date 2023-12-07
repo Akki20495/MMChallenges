@@ -33,3 +33,46 @@ public class WebPageScreenshot {
         driver.quit();
     }
 }
+
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+
+public class FullPageScreenshot {
+
+    public static void main(String[] args) {
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        // Initialize the ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Open the webpage you want to capture
+        driver.get("https://example.com");
+
+        // Maximize the browser window for a complete screenshot
+        driver.manage().window().maximize();
+
+        // Capture a full-page screenshot
+        Screenshot screenshot = new AShot()
+                .shootingStrategy(ShootingStrategies.viewportPasting(1000))
+                .takeScreenshot(driver);
+
+        // Save the screenshot to a file
+        try {
+            ImageIO.write(screenshot.getImage(), "PNG", new File("full_page_screenshot.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Close the browser
+        driver.quit();
+    }
+}
