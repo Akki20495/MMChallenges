@@ -76,3 +76,15 @@ public class FullPageScreenshot {
         driver.quit();
     }
 }
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>3.141.59</version> <!-- Use the latest version available -->
+</dependency>
+<dependency>
+    <groupId>ru.yandex.qatools.ashot</groupId>
+    <artifactId>ashot</artifactId>
+    <version>1.5.4</version> <!-- Use the latest version available -->
+</dependency>
+
+
