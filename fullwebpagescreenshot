@@ -1,36 +1,30 @@
+<dependency>
+    <groupId>net.sourceforge.htmlunit</groupId>
+    <artifactId>htmlunit-driver</artifactId>
+    <version>2.52.0</version> <!-- Use the latest version available -->
+</dependency>
+
+
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.io.File;
 
 public class WebpageScreenshot {
 
     public static void main(String[] args) {
-        // Set the path to your ChromeDriver executable
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
-
-        // Create ChromeOptions and set it to run in headless mode
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments("--disable-gpu");
-
-        // Initialize ChromeDriver with the configured options
-        WebDriver driver = new ChromeDriver(options);
+        // Create a new instance of the HtmlUnitDriver
+        WebDriver driver = new HtmlUnitDriver();
 
         // Replace "https://example.com" with the URL of the webpage you want to capture
         String url = "https://example.com";
         driver.get(url);
 
-        // Wait for some time to ensure the page is fully loaded (you may need to adjust the wait time)
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Maximize the window to ensure the entire webpage is visible
+        driver.manage().window().maximize();
 
         // Take a screenshot of the entire webpage
-        File screenshotFile = ((ChromeDriver) driver).getScreenshotAs(org.openqa.selenium.OutputType.FILE);
+        File screenshotFile = ((HtmlUnitDriver) driver).getScreenshotAs(org.openqa.selenium.OutputType.FILE);
 
         // Replace "screenshot.png" with the desired file name and path
         screenshotFile.renameTo(new File("path/to/screenshot.png"));
