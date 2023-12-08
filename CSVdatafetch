@@ -1,79 +1,40 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Hashtable;
-
-public class CSVReader {
-
-    public static void main(String[] args) {
-        String csvFile = "your_file.csv"; // Replace with the path to your CSV file
-        Hashtable<String, String> dataHashtable = readCSVFile(csvFile);
-
-        // You can now use dataHashtable as needed
-        // For example, printing the contents
-        for (String key : dataHashtable.keySet()) {
-            System.out.println("Key: " + key + ", Value: " + dataHashtable.get(key));
-        }
-    }
-
-    private static Hashtable<String, String> readCSVFile(String csvFile) {
-        Hashtable<String, String> dataHashtable = new Hashtable<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2) {
-                    // Assuming the first column is the key and the second column is the value
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    dataHashtable.put(key, value);
-                } else {
-                    System.out.println("Skipping invalid line: " + line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return dataHashtable;
-    }
-}
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CSVReader {
 
     public static void main(String[] args) {
         String csvFile = "your_file.csv"; // Replace with the path to your CSV file
-        List<String[]> dataList = readCSVFile(csvFile);
+        List<Map<String, String>> dataList = readCSVFile(csvFile);
 
-        // You can now use dataList as needed
+        // You can now use 'dataList' as needed
         // For example, printing the contents
-        for (String[] row : dataList) {
-            for (int i = 0; i < row.length; i++) {
-                System.out.print(row[i]);
-                if (i < row.length - 1) {
-                    System.out.print(", ");
-                }
+        for (Map<String, String> row : dataList) {
+            for (Map.Entry<String, String> entry : row.entrySet()) {
+                System.out.print(entry.getKey() + ": " + entry.getValue() + ", ");
             }
             System.out.println();
         }
     }
 
-    private static List<String[]> readCSVFile(String csvFile) {
-        List<String[]> dataList = new ArrayList<>();
+    private static List<Map<String, String>> readCSVFile(String csvFile) {
+        List<Map<String, String>> dataList = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String[] headers = br.readLine().split(","); // Assuming the first line contains headers
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                dataList.add(parts);
+                String[] values = line.split(",");
+                Map<String, String> row = new HashMap<>();
+                for (int i = 0; i < headers.length; i++) {
+                    row.put(headers[i].trim(), values[i].trim());
+                }
+                dataList.add(row);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,4 +43,3 @@ public class CSVReader {
         return dataList;
     }
 }
-
