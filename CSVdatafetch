@@ -39,3 +39,47 @@ public class CSVReader {
         return dataHashtable;
     }
 }
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+public class CSVReader {
+
+    public static void main(String[] args) {
+        String csvFile = "your_file.csv"; // Replace with the path to your CSV file
+        List<String[]> dataList = readCSVFile(csvFile);
+
+        // You can now use dataList as needed
+        // For example, printing the contents
+        for (String[] row : dataList) {
+            for (int i = 0; i < row.length; i++) {
+                System.out.print(row[i]);
+                if (i < row.length - 1) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    private static List<String[]> readCSVFile(String csvFile) {
+        List<String[]> dataList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                dataList.add(parts);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dataList;
+    }
+}
+
