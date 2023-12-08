@@ -1,20 +1,20 @@
-<dependency>
-    <groupId>net.sourceforge.htmlunit</groupId>
-    <artifactId>htmlunit-driver</artifactId>
-    <version>2.52.0</version> <!-- Use the latest version available -->
-</dependency>
-
-
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
+import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
 
 public class WebpageScreenshot {
 
     public static void main(String[] args) {
-        // Create a new instance of the HtmlUnitDriver
-        WebDriver driver = new HtmlUnitDriver();
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        // Create a new instance of the ChromeDriver
+        WebDriver driver = new ChromeDriver();
 
         // Replace "https://example.com" with the URL of the webpage you want to capture
         String url = "https://example.com";
@@ -23,11 +23,14 @@ public class WebpageScreenshot {
         // Maximize the window to ensure the entire webpage is visible
         driver.manage().window().maximize();
 
-        // Take a screenshot of the entire webpage
-        File screenshotFile = ((HtmlUnitDriver) driver).getScreenshotAs(org.openqa.selenium.OutputType.FILE);
-
-        // Replace "screenshot.png" with the desired file name and path
-        screenshotFile.renameTo(new File("path/to/screenshot.png"));
+        // Take a screenshot of the entire webpage with additional AShot settings
+        AShot ashot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).fully().withScrollTimeout(500);
+        try {
+            File screenshotFile = new File("path/to/screenshot.png");
+            ImageIO.write(ashot.takeScreenshot(driver).getImage(), "PNG", screenshotFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Close the browser
         driver.quit();
