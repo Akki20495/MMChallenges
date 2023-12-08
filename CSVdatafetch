@@ -1,0 +1,41 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Hashtable;
+
+public class CSVReader {
+
+    public static void main(String[] args) {
+        String csvFile = "your_file.csv"; // Replace with the path to your CSV file
+        Hashtable<String, String> dataHashtable = readCSVFile(csvFile);
+
+        // You can now use dataHashtable as needed
+        // For example, printing the contents
+        for (String key : dataHashtable.keySet()) {
+            System.out.println("Key: " + key + ", Value: " + dataHashtable.get(key));
+        }
+    }
+
+    private static Hashtable<String, String> readCSVFile(String csvFile) {
+        Hashtable<String, String> dataHashtable = new Hashtable<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    // Assuming the first column is the key and the second column is the value
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    dataHashtable.put(key, value);
+                } else {
+                    System.out.println("Skipping invalid line: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dataHashtable;
+    }
+}
