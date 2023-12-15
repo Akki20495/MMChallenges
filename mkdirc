@@ -1,0 +1,24 @@
+import java.io.File;
+
+public class CreateDirectoryExample {
+    public static void main(String[] args) {
+        // Specify the path for the new directory
+        String directoryPath = "/path/to/your/directory";
+
+        // Create a File object with the specified path
+        File directory = new File(directoryPath);
+
+        // Check if the directory doesn't exist, then create it
+        if (!directory.exists()) {
+            boolean isCreated = directory.mkdirs();
+
+            if (isCreated) {
+                System.out.println("Directory created successfully.");
+            } else {
+                System.out.println("Failed to create directory.");
+            }
+        } else {
+            System.out.println("Directory already exists.");
+        }
+    }
+}
