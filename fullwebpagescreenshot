@@ -88,3 +88,44 @@ public class WebpageScreenshot {
     }
 }
 
+
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.io.File;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
+public class FullPageScreenshot {
+    public static void main(String[] args) {
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
+
+        // Create a new instance of the Chrome driver
+        WebDriver driver = new ChromeDriver();
+
+        // Navigate to the webpage
+        driver.get("https://example.com");
+
+        // Execute JavaScript to scroll to the bottom of the page
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+
+        // Take a screenshot of the entire page
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+
+        try {
+            // Save the screenshot to a file
+            FileUtils.copyFile(screenshot, new File("/path/to/fullpage_screenshot.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Close the browser
+        driver.quit();
+    }
+}
+
+
