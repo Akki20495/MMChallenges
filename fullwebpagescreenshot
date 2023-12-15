@@ -36,3 +36,55 @@ public class WebpageScreenshot {
         driver.quit();
     }
 }
+
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+public class WebpageScreenshot {
+
+    public static void main(String[] args) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        WebDriver driver = new ChromeDriver();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        driver.get("https://example.com");
+        Thread.sleep(2000); // Allow time for page to load
+
+        int scrollHeight = ((Number) js.executeScript("return Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );")).intValue();
+        int windowHeight = ((Number) js.executeScript("return window.innerHeight;")).intValue();
+
+        int scrollPosition = 0;
+
+        while (scrollPosition < scrollHeight) {
+            captureAndMergeScreenshots(driver, scrollPosition);
+            scrollPosition += windowHeight;
+            js.executeScript("window.scrollTo(0, " + scrollPosition + ");");
+            Thread.sleep(2000); // Adjust sleep time as needed
+        }
+
+        driver.quit();
+    }
+
+    private static void captureAndMergeScreenshots(WebDriver driver, int scrollPosition) throws IOException {
+        File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        BufferedImage screenshotImage = ImageIO.read(screenshotFile);
+
+        File overlapFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        BufferedImage overlapImage = ImageIO.read(overlapFile);
+
+        // Compare, remove overlap, and merge images
+
+        ImageIO.write(screenshotImage, "png", new File("path/to/save/screenshot.png"));
+    }
+}
+
