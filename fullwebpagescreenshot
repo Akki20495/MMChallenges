@@ -170,3 +170,57 @@ public class FullPageScreenshotFirefox {
 }
 
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class FullPageScreenshotFirefox {
+    public static void main(String[] args) {
+        // Set the path to your GeckoDriver executable
+        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
+
+        // Create FirefoxOptions to enable the built-in screenshot capabilities
+        FirefoxOptions options = new FirefoxOptions();
+        options.addPreference("devtools.screenshot.fullpage", true);
+
+        // Create a new instance of the Firefox driver with the custom options
+        WebDriver driver = new FirefoxDriver(options);
+
+        // Navigate to the webpage
+        driver.get("https://example.com");
+
+        // Find an element on the page (you can adjust this based on your page structure)
+        WebElement element = driver.findElement(By.tagName("body"));
+
+        // Take a full-page screenshot using the developer tool
+        Path screenshotPath = Paths.get("/path/to/fullpage_screenshot_firefox.png");
+        driver.findElement(By.tagName("body")).sendKeys("\uE034");
+        // Above sends the F12 key (developer tools shortcut) to the body element
+
+        try {
+            // Wait for the screenshot to be captured and saved
+            Thread.sleep(3000);
+
+            // You can also wait for some specific element to appear or certain conditions before proceeding
+
+            // Move the screenshot to the desired location
+            Path finalScreenshotPath = Paths.get("/path/to/final_screenshot.png");
+            Path temporaryScreenshotPath = Paths.get(driver.getFullScreenshotAs(screenshotPath.toFile()));
+
+            // Rename the file to the desired location
+            temporaryScreenshotPath.toFile().renameTo(finalScreenshotPath.toFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the browser
+            driver.quit();
+        }
+    }
+}
+
+
