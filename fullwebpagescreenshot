@@ -129,3 +129,44 @@ public class FullPageScreenshot {
 }
 
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+
+import java.io.File;
+
+public class FullPageScreenshotFirefox {
+    public static void main(String[] args) {
+        // Set the path to your GeckoDriver executable
+        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
+
+        // Create a Firefox profile to enable the built-in full-page screenshot capability
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("devtools.screenshot.fullpage", true);
+
+        // Set up Firefox options with the custom profile
+        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
+
+        // Create a new instance of the Firefox driver
+        WebDriver driver = new FirefoxDriver(options);
+
+        // Navigate to the webpage
+        driver.get("https://example.com");
+
+        // Take a screenshot of the entire page (full page)
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+
+        try {
+            // Save the screenshot to a file
+            FileUtils.copyFile(screenshot, new File("/path/to/fullpage_screenshot_firefox.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Close the browser
+        driver.quit();
+    }
+}
+
+
