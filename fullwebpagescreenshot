@@ -224,3 +224,40 @@ public class FullPageScreenshotFirefox {
 }
 
 
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+
+public class FullPageScreenshotFirefox {
+    public static void main(String[] args) {
+        // Set the path to your GeckoDriver executable
+        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
+
+        // Create a new instance of the Firefox driver
+        WebDriver driver = new FirefoxDriver();
+
+        // Navigate to the webpage
+        driver.get("https://example.com");
+
+        // Take a screenshot of the entire page (full page)
+        Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
+
+        try {
+            // Save the screenshot to a file
+            ImageIO.write(screenshot.getImage(), "PNG", new File("/path/to/fullpage_screenshot_firefox.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the browser
+            driver.quit();
+        }
+    }
+}
+
+
