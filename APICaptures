@@ -1,0 +1,43 @@
+import io.webfolder.cdp.Launcher;
+import io.webfolder.cdp.exception.CdpException;
+import io.webfolder.cdp.session.Session;
+import io.webfolder.cdp.session.SessionFactory;
+import java.io.FileOutputStream;
+import java.util.Map;
+
+public class EdgeDevToolsExample {
+    public static void main(String[] args) {
+        Launcher launcher = new Launcher();
+
+        try (SessionFactory factory = launcher.launch()) {
+            try (Session session = factory.create()) {
+                // Navigate to a website
+                session.navigate("https://example.com");
+                session.waitDocumentReady();
+
+                // Capture screenshot
+                try {
+                    Map<String, Object> result = session.send("Page.captureScreenshot", null);
+
+                    // Extract base64-encoded image data
+                    String base64EncodedPng = (String) result.get("data");
+
+                    // Save the screenshot to a file
+                    saveScreenshotToFile(base64EncodedPng, "path/to/screenshot.png");
+                } catch (CdpException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void saveScreenshotToFile(String base64EncodedPng, String filePath) {
+        try (FileOutputStream stream = new FileOutputStream(filePath)) {
+            byte[] imageBytes = java.util.Base64.getDecoder().decode(base64EncodedPng);
+            stream.write(imageBytes);
+            System.out.println("Screenshot saved at: " + filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
