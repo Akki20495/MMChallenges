@@ -1,0 +1,37 @@
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class ScreenshotExample {
+    public static void main(String[] args) {
+        WebDriver driver = YourDriverInitializationMethod(); // Initialize your WebDriver (e.g., ChromeDriver, FirefoxDriver)
+
+        // Create a JavascriptExecutor object
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        // Execute JavaScript code to capture screenshot
+        String script = "var canvas = document.createElement('canvas'); " +
+                        "var context = canvas.getContext('2d'); " +
+                        "canvas.width = document.documentElement.scrollWidth; " +
+                        "canvas.height = document.documentElement.scrollHeight; " +
+                        "context.drawWindow(window, 0, 0, canvas.width, canvas.height, 'rgb(255,255,255)'); " +
+                        "var dataUrl = canvas.toDataURL('image/png'); " +
+                        "return dataUrl;";
+        String dataUrl = (String) js.executeScript(script);
+
+        // Create a new WebElement (image) and set its source to the data URL
+        WebElement img = (WebElement) js.executeScript("var img = new Image(); img.src = arguments[0]; return img;", dataUrl);
+
+        // Append the image to the body of the document (optional)
+        js.executeScript("document.body.appendChild(arguments[0]);", img);
+        
+        // Close the browser (or perform other actions as needed)
+        driver.quit();
+    }
+
+    // Other methods, if needed
+    private static WebDriver YourDriverInitializationMethod() {
+        // Add your WebDriver initialization logic (e.g., ChromeDriver, FirefoxDriver)
+        return null;
+    }
+}
