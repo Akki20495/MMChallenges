@@ -1,0 +1,27 @@
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
+import org.openqa.selenium.OutputType;
+
+public class SelenideChromeDriverEx {
+
+    public SelenideChromeDriverEx() {
+        Configuration.browser = "chrome";
+        Configuration.startMaximized = true;
+        // Add any additional configuration options if needed
+    }
+
+    public <X> X getFullScreenshotAs(OutputType<X> outputType) {
+        Configuration.headless = false; // Adjust as needed
+        Selenide.open();
+        Selenide.executeJavaScript(
+            "({" +
+            "width: Math.max(window.innerWidth,document.body.scrollWidth,document.documentElement.scrollWidth)|0," +
+            "height: Math.max(window.innerHeight,document.body.scrollHeight,document.documentElement.scrollHeight)|0," +
+            "deviceScaleFactor: window.devicePixelRatio || 1," +
+            "mobile: typeof window.orientation !== 'undefined'" +
+            "})");
+        Selenide.screenshot("screenshot");
+        // Additional Selenide methods for handling screenshots
+        return outputType.convertFromBase64Png("base64EncodedPng"); // Replace with the actual base64 PNG
+    }
+}
