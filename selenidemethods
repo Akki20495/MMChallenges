@@ -1,27 +1,73 @@
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.OutputType;
+
+import java.io.File;
 
 public class SelenideChromeDriverEx {
 
-    public SelenideChromeDriverEx() {
+    public static void main(String[] args) {
         Configuration.browser = "chrome";
         Configuration.startMaximized = true;
-        // Add any additional configuration options if needed
+        Configuration.headless = false; // Adjust as needed
+
+        ChromeDriverEx driver = new ChromeDriverEx();
+
+        Selenide.open("https://stackoverflow.com/questions");
+        File file = driver.getFullScreenshotAs(OutputType.FILE);
+    }
+}
+
+import com.codeborne.selenide.SelenideDriver;
+import com.codeborne.selenide.impl.WebElementSource;
+import com.google.common.collect.ImmutableMap;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CommandInfo;
+import org.openqa.selenium.remote.HttpCommandExecutor;
+import org.openqa.selenium.remote.http.HttpMethod;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+public class ChromeDriverEx extends SelenideDriver {
+
+    public ChromeDriverEx() {
+        super(new ChromeOptions().setExperimentalOption("useAutomationExtension", false)
+                .addArguments("disable-infobars"));
+        start();
     }
 
     public <X> X getFullScreenshotAs(OutputType<X> outputType) {
-        Configuration.headless = false; // Adjust as needed
-        Selenide.open();
-        Selenide.executeJavaScript(
-            "({" +
-            "width: Math.max(window.innerWidth,document.body.scrollWidth,document.documentElement.scrollWidth)|0," +
-            "height: Math.max(window.innerHeight,document.body.scrollHeight,document.documentElement.scrollHeight)|0," +
-            "deviceScaleFactor: window.devicePixelRatio || 1," +
-            "mobile: typeof window.orientation !== 'undefined'" +
-            "})");
-        Selenide.screenshot("screenshot");
-        // Additional Selenide methods for handling screenshots
-        return outputType.convertFromBase64Png("base64EncodedPng"); // Replace with the actual base64 PNG
+        Object metrics = execute("sendEvaluate",
+                "({" +
+                        "width: Math.max(window.innerWidth,document.body.scrollWidth,document.documentElement.scrollWidth)|0," +
+                        "height: Math.max(window.innerHeight,document.body.scrollHeight,document.documentElement.scrollHeight)|0," +
+                        "deviceScaleFactor: window.devicePixelRatio || 1," +
+                        "mobile: typeof window.orientation !== 'undefined'" +
+                        "})");
+        execute("sendCommand", "Emulation.setDeviceMetricsOverride", metrics);
+
+        Object result = execute("sendCommand",
+                "Page.captureScreenshot",
+                ImmutableMap.of("format", "png", "fromSurface", true));
+
+        execute("sendCommand", "Emulation.clearDeviceMetricsOverride", ImmutableMap.of());
+
+        String base64EncodedPng = ((Map<String, ?>) result).get("data").toString();
+        return outputType.convertFromBase64Png(base64EncodedPng);
+    }
+
+    private Object execute(String command, String cmd, Object params) {
+        WebElementSource elementSource = new WebElementSource(driver(), null, null, null);
+        Object response = executeMethod(elementSource, command, ImmutableMap.of("cmd", cmd, "params", params));
+        return ((Map<String, ?>) response).get("value");
+    }
+
+    private Object executeMethod(WebElementSource elementSource, String methodName, Map<String, ?> params) {
+        return elementSource.execute(methodName, params);
     }
 }
