@@ -41,6 +41,21 @@ public class ExcelWriter {
 
             // Get the row count
             int rowCount = sheet.getPhysicalNumberOfRows();
+
+            // Check if headers exist, if not, create them
+            if (rowCount == 0) {
+                Row headerRow = sheet.createRow(0);
+                Iterator<String> fieldNames = jsonNode.fieldNames();
+                int headerIndex = 0;
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    Cell headerCell = headerRow.createCell(headerIndex++);
+                    headerCell.setCellValue(fieldName);
+                }
+                rowCount++; // Increment row count after adding headers
+            }
+
+            // Create a new row
             Row row = sheet.createRow(rowCount);
 
             // Write JSON data to Excel
