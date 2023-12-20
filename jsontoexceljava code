@@ -50,30 +50,28 @@ public class ExcelWriter {
                 headerRow = sheet.getRow(0);
             }
 
+            // Iterate through JSON data and match headers with keys
             Iterator<String> fieldNames = jsonNode.fieldNames();
-            int headerIndex = 0;
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
-                Cell headerCell;
-                if (headerRow.getCell(headerIndex) == null) {
-                    headerCell = headerRow.createCell(headerIndex);
-                } else {
-                    headerCell = headerRow.getCell(headerIndex);
+                int headerIndex = findHeaderIndex(headerRow, fieldName);
+
+                // If header not found, add a new one
+                if (headerIndex == -1) {
+                    headerIndex = headerRow.getLastCellNum();
+                    Cell headerCell = headerRow.createCell(headerIndex);
+                    headerCell.setCellValue(fieldName);
                 }
-                headerCell.setCellValue(fieldName);
-                headerIndex++;
-            }
 
-            // Create a new row
-            Row dataRow = sheet.createRow(rowCount);
-
-            // Write JSON data to Excel
-            fieldNames = jsonNode.fieldNames();
-            int cellIndex = 0;
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
-                Cell cell = dataRow.createCell(cellIndex++);
-                cell.setCellValue(jsonNode.get(fieldName).asText());
+                // Create a new row and write JSON data to the appropriate column
+                Row dataRow;
+                if (rowCount == 0) {
+                    dataRow = sheet.createRow(1);
+                } else {
+                    dataRow = sheet.getRow(rowCount);
+                }
+                Cell dataCell = dataRow.createCell(headerIndex);
+                dataCell.setCellValue(jsonNode.get(fieldName).asText());
             }
 
             // Save the changes to the Excel file
@@ -86,5 +84,18 @@ public class ExcelWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static int findHeaderIndex(Row headerRow, String fieldName) {
+        Iterator<Cell> cellIterator = headerRow.cellIterator();
+        int index = 0;
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            if (cell.getStringCellValue().equals(fieldName)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
     }
 }
