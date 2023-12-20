@@ -69,7 +69,11 @@ public class ExcelWriter {
                     dataRow = sheet.createRow(1);
                 } else {
                     dataRow = sheet.getRow(rowCount);
+                    if (dataRow == null) {
+                        dataRow = sheet.createRow(rowCount);
+                    }
                 }
+
                 Cell dataCell = dataRow.createCell(headerIndex);
                 dataCell.setCellValue(jsonNode.get(fieldName).asText());
             }
