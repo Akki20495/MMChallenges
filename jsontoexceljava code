@@ -64,14 +64,9 @@ public class ExcelWriter {
                 }
 
                 // Create a new row and write JSON data to the appropriate column
-                Row dataRow;
-                if (rowCount == 0) {
-                    dataRow = sheet.createRow(1);
-                } else {
-                    dataRow = sheet.getRow(rowCount);
-                    if (dataRow == null) {
-                        dataRow = sheet.createRow(rowCount);
-                    }
+                Row dataRow = sheet.getRow(rowCount);
+                if (dataRow == null) {
+                    dataRow = sheet.createRow(rowCount);
                 }
 
                 Cell dataCell = dataRow.createCell(headerIndex);
