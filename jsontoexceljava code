@@ -17,14 +17,12 @@ public class ExcelWriter {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Sample JSON data (replace with your actual JSON data)
-            String jsonData = "{\"Header1\": \"Value1\", \"Header2\": \"Value2\", \"NewHeader\": \"NewValue\"}";
-
-            // Read JSON data
-            JsonNode jsonNode = objectMapper.readTree(jsonData);
+        
+            JsonNode jsonNode = objectMapper.readTree(new FileReader("filePath"));
 
             // Check if Excel file exists or create a new one
             Workbook workbook;
+Sheet sheet;
             File file = new File(EXCEL_FILE_PATH);
             if (file.exists()) {
                 FileInputStream inputStream = new FileInputStream(file);
@@ -34,11 +32,8 @@ public class ExcelWriter {
             }
 
             // Get or create a sheet (assuming only one sheet)
-            Sheet sheet = workbook.getSheetAt(0);
-            if (sheet == null) {
-                sheet = workbook.createSheet();
-            }
-
+            Sheet sheet = workbook.getSheetAt(getSheetOrCreateSheet(workbook,"Testing"));
+          
             // Get the row count
             int rowCount = sheet.getPhysicalNumberOfRows();
 
@@ -54,14 +49,19 @@ public class ExcelWriter {
             Iterator<String> fieldNames = jsonNode.fieldNames();
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
-                int headerIndex = findHeaderIndex(headerRow, fieldName);
+                int headerColumn = findHeaderIndex(headerRow, fieldName);
 
                 // If header not found, add a new one
                 if (headerIndex == -1) {
+if(headerRow.getLastCellNum()<0) headerColumn=0;
+else
+headerColumn =headerRow.getLastCellNum();
                     headerIndex = headerRow.getLastCellNum();
-                    Cell headerCell = headerRow.createCell(headerIndex);
+                    Cell headerCell = headerRow.createCell(headerColumn);
                     headerCell.setCellValue(fieldName);
                 }
+if(rowCount==0 && headerColumn==0)
+rowCount=1;
 
                 // Create a new row and write JSON data to the appropriate column
                 Row dataRow = sheet.getRow(rowCount);
@@ -69,7 +69,7 @@ public class ExcelWriter {
                     dataRow = sheet.createRow(rowCount);
                 }
 
-                Cell dataCell = dataRow.createCell(headerIndex);
+                Cell dataCell = dataRow.createCell(headerColumn);
                 dataCell.setCellValue(jsonNode.get(fieldName).asText());
             }
 
@@ -97,4 +97,14 @@ public class ExcelWriter {
         }
         return -1;
     }
+
+private static int getSheetOrCreateSheet(Workbook wb, String SheetName){
+int i=0;
+for(;i<wb.getNumberOfSheets();i++){
+if(SheetName.equalIgnoreCase(wb.getSheetName(i)))
+return i;
+}
+wb.createSheet(SheetName);
+return i;
+}
 }
