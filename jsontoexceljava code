@@ -52,11 +52,11 @@ Sheet sheet;
                 int headerColumn = findHeaderIndex(headerRow, fieldName);
 
                 // If header not found, add a new one
-                if (headerIndex == -1) {
+                if (headerColumn == -1) {
 if(headerRow.getLastCellNum()<0) headerColumn=0;
 else
 headerColumn =headerRow.getLastCellNum();
-                    headerIndex = headerRow.getLastCellNum();
+                    headerColumn = headerRow.getLastCellNum();
                     Cell headerCell = headerRow.createCell(headerColumn);
                     headerCell.setCellValue(fieldName);
                 }
@@ -101,7 +101,7 @@ rowCount=1;
 private static int getSheetOrCreateSheet(Workbook wb, String SheetName){
 int i=0;
 for(;i<wb.getNumberOfSheets();i++){
-if(SheetName.equalIgnoreCase(wb.getSheetName(i)))
+if(SheetName.equalsIgnoreCase(wb.getSheetName(i)))
 return i;
 }
 wb.createSheet(SheetName);
