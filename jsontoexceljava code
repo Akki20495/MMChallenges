@@ -18,7 +18,7 @@ public class ExcelWriter {
             ObjectMapper objectMapper = new ObjectMapper();
 
             // Sample JSON data (replace with your actual JSON data)
-            String jsonData = "{\"Header1\": \"Value1\", \"Header2\": \"Value2\"}";
+            String jsonData = "{\"Header1\": \"Value1\", \"Header2\": \"Value2\", \"NewHeader\": \"NewValue\"}";
 
             // Read JSON data
             JsonNode jsonNode = objectMapper.readTree(jsonData);
@@ -42,28 +42,37 @@ public class ExcelWriter {
             // Get the row count
             int rowCount = sheet.getPhysicalNumberOfRows();
 
-            // Check if headers exist, if not, create them
+            // Create or update headers
+            Row headerRow;
             if (rowCount == 0) {
-                Row headerRow = sheet.createRow(0);
-                Iterator<String> fieldNames = jsonNode.fieldNames();
-                int headerIndex = 0;
-                while (fieldNames.hasNext()) {
-                    String fieldName = fieldNames.next();
-                    Cell headerCell = headerRow.createCell(headerIndex++);
-                    headerCell.setCellValue(fieldName);
+                headerRow = sheet.createRow(0);
+            } else {
+                headerRow = sheet.getRow(0);
+            }
+
+            Iterator<String> fieldNames = jsonNode.fieldNames();
+            int headerIndex = 0;
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                Cell headerCell;
+                if (headerRow.getCell(headerIndex) == null) {
+                    headerCell = headerRow.createCell(headerIndex);
+                } else {
+                    headerCell = headerRow.getCell(headerIndex);
                 }
-                rowCount++; // Increment row count after adding headers
+                headerCell.setCellValue(fieldName);
+                headerIndex++;
             }
 
             // Create a new row
-            Row row = sheet.createRow(rowCount);
+            Row dataRow = sheet.createRow(rowCount);
 
             // Write JSON data to Excel
-            Iterator<String> fieldNames = jsonNode.fieldNames();
+            fieldNames = jsonNode.fieldNames();
             int cellIndex = 0;
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
-                Cell cell = row.createCell(cellIndex++);
+                Cell cell = dataRow.createCell(cellIndex++);
                 cell.setCellValue(jsonNode.get(fieldName).asText());
             }
 
