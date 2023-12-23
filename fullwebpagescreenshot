@@ -1,263 +1,55 @@
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
-
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
-
-public class WebpageScreenshot {
-
-    public static void main(String[] args) {
-        // Set the path to your ChromeDriver executable
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
-
-        // Create a new instance of the ChromeDriver
-        WebDriver driver = new ChromeDriver();
-
-        // Replace "https://example.com" with the URL of the webpage you want to capture
-        String url = "https://example.com";
-        driver.get(url);
-
-        // Maximize the window to ensure the entire webpage is visible
-        driver.manage().window().maximize();
-
-        // Take a screenshot of the entire webpage with additional AShot settings
-        AShot ashot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).fully().withScrollTimeout(500);
-        try {
-            File screenshotFile = new File("path/to/screenshot.png");
-            ImageIO.write(ashot.takeScreenshot(driver).getImage(), "PNG", screenshotFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Close the browser
-        driver.quit();
-    }
-}
-
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-public class WebpageScreenshot {
-
-    public static void main(String[] args) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
-        WebDriver driver = new ChromeDriver();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        driver.get("https://example.com");
-        Thread.sleep(2000); // Allow time for page to load
-
-        int scrollHeight = ((Number) js.executeScript("return Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );")).intValue();
-        int windowHeight = ((Number) js.executeScript("return window.innerHeight;")).intValue();
-
-        int scrollPosition = 0;
-
-        while (scrollPosition < scrollHeight) {
-            captureAndMergeScreenshots(driver, scrollPosition);
-            scrollPosition += windowHeight;
-            js.executeScript("window.scrollTo(0, " + scrollPosition + ");");
-            Thread.sleep(2000); // Adjust sleep time as needed
-        }
-
-        driver.quit();
-    }
-
-    private static void captureAndMergeScreenshots(WebDriver driver, int scrollPosition) throws IOException {
-        File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        BufferedImage screenshotImage = ImageIO.read(screenshotFile);
-
-        File overlapFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        BufferedImage overlapImage = ImageIO.read(overlapFile);
-
-        // Compare, remove overlap, and merge images
-
-        ImageIO.write(screenshotImage, "png", new File("path/to/save/screenshot.png"));
-    }
-}
-
-
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-
-import java.io.File;
-import org.apache.commons.io.FileUtils;
+import java.lang.reflect.Method;
+import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CommandInfo;
+import org.openqa.selenium.remote.HttpCommandExecutor;
+import org.openqa.selenium.remote.http.HttpMethod;
 
-public class FullPageScreenshot {
-    public static void main(String[] args) {
-        // Set the path to your ChromeDriver executable
-        System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
 
-        // Create a new instance of the Chrome driver
-        WebDriver driver = new ChromeDriver();
+public class ChromeDriverEx extends ChromeDriver {
 
-        // Navigate to the webpage
-        driver.get("https://example.com");
+    public ChromeDriverEx() throws Exception {
+        this(new ChromeOptions());
+    }
 
-        // Execute JavaScript to scroll to the bottom of the page
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+    public ChromeDriverEx(ChromeOptions options) throws Exception {
+        this(ChromeDriverService.createDefaultService(), options);
+    }
 
-        // Take a screenshot of the entire page
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+    public ChromeDriverEx(ChromeDriverService service, ChromeOptions options) throws Exception {
+        super(service, options);
+        CommandInfo cmd = new CommandInfo("/session/:sessionId/chromium/send_command_and_get_result", HttpMethod.POST);
+        Method defineCommand = HttpCommandExecutor.class.getDeclaredMethod("defineCommand", String.class, CommandInfo.class);
+        defineCommand.setAccessible(true);
+        defineCommand.invoke(super.getCommandExecutor(), "sendCommand", cmd);
+    }
 
-        try {
-            // Save the screenshot to a file
-            FileUtils.copyFile(screenshot, new File("/path/to/fullpage_screenshot.png"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public <X> X getFullScreenshotAs(OutputType<X> outputType) throws Exception {
+        Object metrics = sendEvaluate(
+            "({" +
+            "width: Math.max(window.innerWidth,document.body.scrollWidth,document.documentElement.scrollWidth)|0," +
+            "height: Math.max(window.innerHeight,document.body.scrollHeight,document.documentElement.scrollHeight)|0," +
+            "deviceScaleFactor: window.devicePixelRatio || 1," +
+            "mobile: typeof window.orientation !== 'undefined'" +
+            "})");
+        sendCommand("Emulation.setDeviceMetricsOverride", metrics);
+        Object result = sendCommand("Page.captureScreenshot", ImmutableMap.of("format", "png", "fromSurface", true));
+        sendCommand("Emulation.clearDeviceMetricsOverride", ImmutableMap.of());
+        String base64EncodedPng = (String)((Map<String, ?>)result).get("data");
+        return outputType.convertFromBase64Png(base64EncodedPng);
+    }
 
-        // Close the browser
-        driver.quit();
+    protected Object sendCommand(String cmd, Object params) {
+        return execute("sendCommand", ImmutableMap.of("cmd", cmd, "params", params)).getValue();
+    }
+
+    protected Object sendEvaluate(String script) {
+        Object response = sendCommand("Runtime.evaluate", ImmutableMap.of("returnByValue", true, "expression", script));
+        Object result = ((Map<String, ?>)response).get("result");
+        return ((Map<String, ?>)result).get("value");
     }
 }
-
-
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-
-import java.io.File;
-
-public class FullPageScreenshotFirefox {
-    public static void main(String[] args) {
-        // Set the path to your GeckoDriver executable
-        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
-
-        // Create a Firefox profile to enable the built-in full-page screenshot capability
-        FirefoxProfile profile = new FirefoxProfile();
-        profile.setPreference("devtools.screenshot.fullpage", true);
-
-        // Set up Firefox options with the custom profile
-        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
-
-        // Create a new instance of the Firefox driver
-        WebDriver driver = new FirefoxDriver(options);
-
-        // Navigate to the webpage
-        driver.get("https://example.com");
-
-        // Take a screenshot of the entire page (full page)
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-
-        try {
-            // Save the screenshot to a file
-            FileUtils.copyFile(screenshot, new File("/path/to/fullpage_screenshot_firefox.png"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Close the browser
-        driver.quit();
-    }
-}
-
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-public class FullPageScreenshotFirefox {
-    public static void main(String[] args) {
-        // Set the path to your GeckoDriver executable
-        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
-
-        // Create FirefoxOptions to enable the built-in screenshot capabilities
-        FirefoxOptions options = new FirefoxOptions();
-        options.addPreference("devtools.screenshot.fullpage", true);
-
-        // Create a new instance of the Firefox driver with the custom options
-        WebDriver driver = new FirefoxDriver(options);
-
-        // Navigate to the webpage
-        driver.get("https://example.com");
-
-        // Find an element on the page (you can adjust this based on your page structure)
-        WebElement element = driver.findElement(By.tagName("body"));
-
-        // Take a full-page screenshot using the developer tool
-        Path screenshotPath = Paths.get("/path/to/fullpage_screenshot_firefox.png");
-        driver.findElement(By.tagName("body")).sendKeys("\uE034");
-        // Above sends the F12 key (developer tools shortcut) to the body element
-
-        try {
-            // Wait for the screenshot to be captured and saved
-            Thread.sleep(3000);
-
-            // You can also wait for some specific element to appear or certain conditions before proceeding
-
-            // Move the screenshot to the desired location
-            Path finalScreenshotPath = Paths.get("/path/to/final_screenshot.png");
-            Path temporaryScreenshotPath = Paths.get(driver.getFullScreenshotAs(screenshotPath.toFile()));
-
-            // Rename the file to the desired location
-            temporaryScreenshotPath.toFile().renameTo(finalScreenshotPath.toFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // Close the browser
-            driver.quit();
-        }
-    }
-}
-
-
-
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
-
-import javax.imageio.ImageIO;
-import java.io.File;
-
-public class FullPageScreenshotFirefox {
-    public static void main(String[] args) {
-        // Set the path to your GeckoDriver executable
-        System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
-
-        // Create a new instance of the Firefox driver
-        WebDriver driver = new FirefoxDriver();
-
-        // Navigate to the webpage
-        driver.get("https://example.com");
-
-        // Take a screenshot of the entire page (full page)
-        Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
-
-        try {
-            // Save the screenshot to a file
-            ImageIO.write(screenshot.getImage(), "PNG", new File("/path/to/fullpage_screenshot_firefox.png"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // Close the browser
-            driver.quit();
-        }
-    }
-}
-
-
