@@ -1,0 +1,53 @@
+<dependencies>
+    <!-- Jackson XML -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-xml</artifactId>
+        <version>2.13.0</version> <!-- Replace with the latest version -->
+    </dependency>
+
+    <!-- Jackson Databind -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.13.0</version> <!-- Replace with the latest version -->
+    </dependency>
+</dependencies>
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
+import java.io.File;
+import java.io.IOException;
+
+public class XmlToJsonConverter {
+
+    public static void main(String[] args) {
+        try {
+            // Read XML data from a file
+            File xmlFile = new File("input.xml");
+
+            // Initialize XML mapper
+            XmlMapper xmlMapper = new XmlMapper();
+
+            // Convert XML to JSON
+            JsonNode jsonNode = xmlMapper.readTree(xmlFile);
+
+            // Create JSON string
+            String jsonString = jsonNode.toString();
+
+            // Output the JSON string
+            System.out.println(jsonString);
+
+            // You can also write the JSON to a file if needed
+            // File jsonOutputFile = new File("output.json");
+            // ObjectMapper jsonMapper = new ObjectMapper();
+            // jsonMapper.writeValue(jsonOutputFile, jsonNode);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
