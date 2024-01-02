@@ -1,0 +1,60 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
+
+public class JsonToExcelConverter {
+
+    public static void main(String[] args) {
+        try {
+            // Your corrected JSON data
+            String jsonData = "{" +
+                    "\"Project\":[" +
+                    "{\"Name\":\"DSIT\",\"UID\":\"e4ff38db-0fee-4839-8093-f84bcbeb80eb\"}," +
+                    "{\"Name\":\"MTN_MuniGIC\",\"UID\":\"5bd1ff86-7e83-4002-bb87-705d7bc7edef\"}," +
+                    "{\"Name\":\"SIERA_Data\",\"UID\":\"996a5789-ecf3-40e8-91c-e22e50d0d31f\"}" +
+                    "]" +
+                    "}";
+
+            // Read JSON data
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonArray = objectMapper.readTree(jsonData).get("Project");
+
+            // Create Excel workbook and sheet
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("DataSheet");
+
+            int rownum = 0;
+
+            // Iterate through JSON data and write to Excel
+            for (JsonNode jsonNode : jsonArray) {
+                Row row = sheet.createRow(rownum++);
+
+                int cellnum = 0;
+                Iterator<String> fieldNames = jsonNode.fieldNames();
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    Cell cell = row.createCell(cellnum++);
+                    cell.setCellValue(jsonNode.get(fieldName).asText());
+                }
+            }
+
+            // Write the workbook to an Excel file
+            FileOutputStream excelFile = new FileOutputStream(new File("output.xlsx"));
+            workbook.write(excelFile);
+
+            // Close streams
+            excelFile.close();
+
+            System.out.println("Excel file created successfully.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
