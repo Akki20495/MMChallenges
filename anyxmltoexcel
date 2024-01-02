@@ -1,0 +1,46 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+
+public class XmlToExcelConverter {
+
+    public static void main(String[] args) {
+        try {
+            // Read XML data from a file (you can modify this to get XML from other sources)
+            File xmlFile = new File("input.xml");
+            JAXBContext jaxbContext = JAXBContext.newInstance(YourXmlClass.class); // Replace with your XML class
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            YourXmlClass xmlData = (YourXmlClass) jaxbUnmarshaller.unmarshal(xmlFile);
+
+            // Create Excel workbook and sheet
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("DataSheet");
+
+            int rownum = 0;
+
+            // Iterate through XML data and write to Excel
+            // Adjust the logic based on the structure of your XML data
+            Row row = sheet.createRow(rownum++);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Sample XML to Excel conversion");
+
+            // Example: If your XML has nested elements, you may need nested loops here
+
+            // Write the workbook to an Excel file
+            FileOutputStream excelFile = new FileOutputStream(new File("output.xlsx"));
+            workbook.write(excelFile);
+
+            // Close the streams
+            excelFile.close();
+
+            System.out.println("Excel file created successfully.");
+
+        } catch (JAXBException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
