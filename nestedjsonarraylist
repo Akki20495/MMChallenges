@@ -1,0 +1,50 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+
+public class JsonNodeIterator {
+    public static void main(String[] args) {
+        // Specify the path to your JSON file
+        String filePath = "path/to/your/file.json";
+
+        try {
+            // Create ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Read JSON file into JsonNode
+            JsonNode rootNode = objectMapper.readTree(new File(filePath));
+
+            // Start iterating through the JSON data
+            iterateJsonNode(rootNode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void iterateJsonNode(JsonNode jsonNode) {
+        // Check if the current node is an array
+        if (jsonNode.isArray()) {
+            // Iterate through the array
+            for (JsonNode arrayElement : jsonNode) {
+                // Recursively call the function for each array element
+                iterateJsonNode(arrayElement);
+            }
+        } else if (jsonNode.isObject()) {
+            // If it's an object, iterate through its fields
+            Iterator<String> fieldNames = jsonNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode fieldValue = jsonNode.get(fieldName);
+
+                // Recursively call the function for each field value
+                iterateJsonNode(fieldValue);
+            }
+        } else {
+            // If it's neither an array nor an object, you've reached the data you're looking for
+            System.out.println("Found ArrayList data: " + jsonNode);
+        }
+    }
+}
