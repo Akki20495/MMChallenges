@@ -1,0 +1,26 @@
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+
+public class ApiGetWithAuthenticationExample {
+    public static void main(String[] args) {
+        // Specify the base URI of the API
+        RestAssured.baseURI = "https://api.example.com";
+
+        // Provide authentication credentials
+        String username = "yourUsername";
+        String password = "yourPassword";
+
+        // Make a GET request to a specific endpoint with authentication
+        Response response = RestAssured.given()
+                .auth()
+                .basic(username, password)
+                .get("/endpoint");
+
+        // Print the response body
+        System.out.println("Response Body: " + response.asString());
+
+        // Retrieve and print the status code
+        int statusCode = response.getStatusCode();
+        System.out.println("Status Code: " + statusCode);
+    }
+}
