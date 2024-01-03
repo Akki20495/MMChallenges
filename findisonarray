@@ -1,0 +1,53 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+
+public class JsonArrayFinder {
+    public static void main(String[] args) {
+        // Specify the path to your JSON file
+        String filePath = "path/to/your/file.json";
+
+        try {
+            // Create ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Read JSON file into JsonNode
+            JsonNode rootNode = objectMapper.readTree(new File(filePath));
+
+            // Find and print the JsonArray (if any)
+            ArrayNode resultArray = findJsonArray(rootNode);
+            if (resultArray != null) {
+                System.out.println("Found JsonArray: " + resultArray);
+            } else {
+                System.out.println("No JsonArray found in the JSON file.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ArrayNode findJsonArray(JsonNode jsonNode) {
+        // Check if the current node is an array
+        if (jsonNode.isArray()) {
+            return (ArrayNode) jsonNode; // Return the JsonArray when found
+        } else if (jsonNode.isObject()) {
+            // If it's an object, iterate through its fields
+            Iterator<String> fieldNames = jsonNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode fieldValue = jsonNode.get(fieldName);
+
+                // Recursively call the function for each field value
+                ArrayNode resultArray = findJsonArray(fieldValue);
+                if (resultArray != null) {
+                    return resultArray; // Propagate the result upward if found
+                }
+            }
+        }
+        return null; // Return null if no JsonArray is found in the current subtree
+    }
+}
