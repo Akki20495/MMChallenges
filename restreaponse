@@ -1,0 +1,25 @@
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+
+public class RestAssuredExample {
+
+    public static void main(String[] args) {
+        // POST request to authenticate and get cookies
+        Response loginResponse = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body("{ \"username\": \"yourUsername\", \"password\": \"yourPassword\" }")
+                .post("https://example.com/api/login");
+
+        // Extract cookies from the login response
+        String cookies = loginResponse.getHeaders().getValue("Set-Cookie");
+
+        // Use cookies to make another request (GET request for JSON data)
+        Response jsonDataResponse = RestAssured.given()
+                .header("Cookie", cookies)
+                .get("https://example.com/api/data");
+
+        // Print the JSON data
+        System.out.println("JSON Data: " + jsonDataResponse.getBody().asString());
+    }
+}
