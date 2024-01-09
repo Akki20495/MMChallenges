@@ -1,0 +1,73 @@
+package org.example;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonParserExample {
+    public static void main(String[] args) {
+        String jsonData = "{\n" +
+                "  \"entities\": [\n" +
+                "    {\n" +
+                "      \"Fields\": [\n" +
+                "        {\n" +
+                "          \"Name\": \"name\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"DSIT\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"Name\": \"id\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"1\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"Type\": \"test-set-folder\",\n" +
+                "      \"children-count\": 0\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"TotalResults\": 1\n" +
+                "}";
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonData);
+
+            JsonNode entitiesNode = jsonNode.get("entities");
+            if (entitiesNode.isArray() && entitiesNode.size() > 0) {
+                JsonNode fieldsNode = entitiesNode.get(0).get("Fields");
+                if (fieldsNode.isArray()) {
+                    for (JsonNode fieldNode : fieldsNode) {
+                        JsonNode nameNode = fieldNode.get("Name");
+                        JsonNode valuesNode = fieldNode.get("values");
+                        if (nameNode != null && valuesNode != null && "name".equals(nameNode.asText())) {
+                            JsonNode idNode = findNodeByName(fieldsNode, "id");
+                            if (idNode != null) {
+                                JsonNode idValueNode = idNode.get("values").get(0).get("value");
+                                if (idValueNode != null) {
+                                    System.out.println("DSIT's id value: " + idValueNode.asText());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static JsonNode findNodeByName(JsonNode arrayNode, String name) {
+        for (JsonNode node : arrayNode) {
+            JsonNode nodeName = node.get("Name");
+            if (nodeName != null && name.equals(nodeName.asText())) {
+                return node;
+            }
+        }
+        return null;
+    }
+}
