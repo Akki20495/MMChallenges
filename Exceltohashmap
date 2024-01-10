@@ -1,0 +1,84 @@
+package org.example;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class exceltojson {
+    public static void main(String[] args) {
+        String excelFilePath = "C:\\Users\\91720\\IdeaProjects\\Pilot\\src\\test\\java\\Excel.xlsx";
+
+        try (FileInputStream fis = new FileInputStream(excelFilePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            // Assuming that data is present in the first sheet (index 0)
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Create a List to store the data
+            List<Map<String, String>> dataList = new ArrayList<>();
+
+            // Read the header row to determine column names
+            Row headerRow = sheet.getRow(0);
+            List<String> columnNames = getColumnNames(headerRow);
+
+            // Iterate through rows
+            Iterator<Row> rowIterator = sheet.iterator();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+
+                // Skip the header row
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+
+                // Create a map for the current row
+                Map<String, String> rowMap = new HashMap<>();
+                for (int i = 0; i < columnNames.size(); i++) {
+                    Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                    String columnName = columnNames.get(i);
+                    String cellValue = (cell != null) ? getCellValueAsString(cell) : "";
+                    rowMap.put(columnName, cellValue);
+                }
+
+                // Add the map to the list
+                dataList.add(rowMap);
+            }
+
+            // Print the List of Maps
+//          dataList.forEach(System.out::println);
+               System.out.println(dataList.get(1).get("Name "));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<String> getColumnNames(Row headerRow) {
+        List<String> columnNames = new ArrayList<>();
+        Iterator<Cell> cellIterator = headerRow.cellIterator();
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            columnNames.add(cell.getStringCellValue());
+        }
+        return columnNames;
+    }
+
+    private static String getCellValueAsString(Cell cell) {
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            default:
+                return "";
+        }
+    }
+}
