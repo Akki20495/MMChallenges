@@ -1,0 +1,57 @@
+package org.example;
+
+import org.apache.poi.EncryptedDocumentException; 
+import org.apache.poi.ss.usermodel.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class comparetwoHeaders {
+        public static void main(String[] args) {
+            String excelFilePath1 = "C:\\Users\\91720\\IdeaProjects\\Pilot\\src\\test\\java\\Excel.xlsx";
+            String sheetName1 = "Sheet1";  // Replace with your sheet name
+
+            String excelFilePath2 = "C:\\Users\\91720\\IdeaProjects\\Pilot\\src\\test\\java\\Excel.xlsx";
+            String sheetName2 = "Sheet2";  // Replace with your sheet name
+
+            try (FileInputStream fis1 = new FileInputStream(excelFilePath1);
+                 Workbook workbook1 = WorkbookFactory.create(fis1);
+                 FileInputStream fis2 = new FileInputStream(excelFilePath2);
+                 Workbook workbook2 = WorkbookFactory.create(fis2)) {
+
+                Sheet sheet1 = workbook1.getSheet(sheetName1);
+                Sheet sheet2 = workbook2.getSheet(sheetName2);
+
+                if (sheet1 != null && sheet2 != null) {
+                    List<String> headers1 = getHeaders(sheet1);
+                    List<String> headers2 = getHeaders(sheet2);
+
+                    // Find common headers
+                    List<String> commonHeaders = new ArrayList<>(headers1);
+                    commonHeaders.retainAll(headers2);
+
+                    // Print common headers
+                    System.out.println("Common Headers:");
+                    commonHeaders.forEach(System.out::println);
+                } else {
+                    System.out.println("Sheet not found in one or both workbooks.");
+                }
+
+            } catch (IOException | EncryptedDocumentException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private static List<String> getHeaders(Sheet sheet) {
+            List<String> headers = new ArrayList<>();
+            Row headerRow = sheet.getRow(0);
+            if (headerRow != null) {
+                for (Cell cell : headerRow) {
+                    headers.add(cell.getStringCellValue());
+                }
+            }
+            return headers;
+        }
+    }
+
