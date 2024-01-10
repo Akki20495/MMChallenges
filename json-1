@@ -1,0 +1,140 @@
+package org.example;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static org.example.gson1.hi1;
+
+public class gson {
+    public static void main(String[] args) {
+    hi1(Objects.requireNonNull(hi()));
+    }
+        public static List<String> hi(){
+        String jsonData = "{\n" +
+                "  \"entities\": [\n" +
+                "    {\n" +
+                "      \"Fields\": [\n" +
+                "        {\n" +
+                "          \"Name\": \"name\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"DSIT\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"Name\": \"id\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"1\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"Type\": \"test-set-folder\",\n" +
+                "      \"children-count\": 0\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"Fields\": [\n" +
+                "        {\n" +
+                "          \"Name\": \"name\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"DSIT123\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"Name\": \"id\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"1\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"Type\": \"test-set-folder\",\n" +
+                "      \"children-count\": 0\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"Fields\": [\n" +
+                "        {\n" +
+                "          \"Name\": \"name\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"DSIT456\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"Name\": \"id\",\n" +
+                "          \"values\": [\n" +
+                "            {\n" +
+                "              \"value\": \"156\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"Type\": \"test-set-folder\",\n" +
+                "      \"children-count\": 0\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"TotalResults\": 1\n" +
+                "}";
+
+        Gson gson = new Gson();
+        JsonObject jsonDataObject = gson.fromJson(jsonData, JsonObject.class);
+
+        String nameToSearch = "DSIT456";
+//        String idToSearch = "1";
+
+        JsonArray entities = jsonDataObject.getAsJsonArray("entities");
+        for (JsonElement entityElement : entities) {
+            JsonObject entityObject = entityElement.getAsJsonObject();
+            JsonArray fields = entityObject.getAsJsonArray("Fields");
+
+            String nameValue = "";
+            String idValue = "";
+
+            // Find the Field object based on the specified name
+            for (JsonElement fieldElement : fields) {
+                JsonObject fieldObject = fieldElement.getAsJsonObject();
+                String fieldName = fieldObject.getAsJsonPrimitive("Name").getAsString();
+                String fieldValue = fieldObject.getAsJsonArray("values")
+                        .get(0).getAsJsonObject()
+                        .getAsJsonPrimitive("value").getAsString();
+
+                if ("name".equals(fieldName)) {
+                    nameValue = fieldValue;
+                } else if ("id".equals(fieldName)) {
+                    idValue = fieldValue;
+                }
+            }
+
+            if (nameToSearch.equals(nameValue)) {
+               return  extractValues(fields);
+
+            }
+
+        } return null;
+    }
+
+    private static List<String> extractValues(JsonArray jsonArray) {
+        List<String> valuesList = new ArrayList<>();
+        for (JsonElement valueElement : jsonArray) {
+            System.out.println(valueElement);
+            valuesList.add(valueElement.toString());
+        }
+        return valuesList;
+    }
+
+}
+
+
+
