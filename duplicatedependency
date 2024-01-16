@@ -1,0 +1,31 @@
+<dependencyManagement>
+    <dependencies>
+        <!-- Define version for AventStack Extent Reports 3.1.2 -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        
+        <!-- Define version for AventStack Extent Reports 5.1.1 -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <!-- Use AventStack Extent Reports 3.1.2 -->
+    <dependency>
+        <groupId>com.aventstack</groupId>
+        <artifactId>extentreports</artifactId>
+    </dependency>
+
+    <!-- Use AventStack Extent Reports 5.1.1 -->
+    <dependency>
+        <groupId>com.aventstack</groupId>
+        <artifactId>extentreports</artifactId>
+    </dependency>
+</dependencies>
