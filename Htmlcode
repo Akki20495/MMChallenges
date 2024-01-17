@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Text Fields</title>
+</head>
+<body>
+  <form>
+    <label for="field1">Text Field 1:</label>
+    <input type="text" id="field1" name="field1"><br>
+
+    <label for="field2">Text Field 2:</label>
+    <input type="text" id="field2" name="field2"><br>
+
+    <label for="field3">Text Field 3:</label>
+    <input type="text" id="field3" name="field3"><br>
+
+    <!-- Add more fields as needed -->
+
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
