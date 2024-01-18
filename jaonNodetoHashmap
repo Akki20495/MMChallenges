@@ -1,0 +1,82 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class JsonNodeToHashMapList {
+    public static void main(String[] args) {
+        // Your JSON data as a string
+        String jsonData = "{ \"key1\": \"value1\", \"key2\": 42, \"key3\": { \"nestedKey\": \"nestedValue\" } }";
+
+        try {
+            // Parse JSON string to JsonNode
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonData);
+
+            // Convert JsonNode to List of HashMaps
+            List<Map<String, Object>> resultList = jsonNodeToListOfHashMaps(jsonNode);
+
+            // Print the result
+            for (Map<String, Object> map : resultList) {
+                System.out.println(map);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<Map<String, Object>> jsonNodeToListOfHashMaps(JsonNode jsonNode) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        if (jsonNode.isObject()) {
+            // If the root is an object, convert it to a HashMap
+            resultList.add(jsonNodeToHashMap(jsonNode));
+        } else if (jsonNode.isArray()) {
+            // If the root is an array, iterate through its elements
+            for (JsonNode arrayElement : jsonNode) {
+                if (arrayElement.isObject()) {
+                    // If an array element is an object, convert it to a HashMap
+                    resultList.add(jsonNodeToHashMap(arrayElement));
+                } else {
+                    // If an array element is not an object, convert it to a HashMap with a single entry
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("value", jsonNodeToValue(arrayElement));
+                    resultList.add(map);
+                }
+            }
+        }
+
+        return resultList;
+    }
+
+    private static Map<String, Object> jsonNodeToHashMap(JsonNode jsonNode) {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
+
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            map.put(entry.getKey(), jsonNodeToValue(entry.getValue()));
+        }
+
+        return map;
+    }
+
+    private static Object jsonNodeToValue(JsonNode jsonNode) {
+        if (jsonNode.isTextual()) {
+            return jsonNode.textValue();
+        } else if (jsonNode.isNumber()) {
+            return jsonNode.numberValue();
+        } else if (jsonNode.isBoolean()) {
+            return jsonNode.booleanValue();
+        } else if (jsonNode.isObject() || jsonNode.isArray()) {
+            return jsonNodeToListOfHashMaps(jsonNode);
+        }
+
+        return null; // Handle other types as needed
+    }
+}
