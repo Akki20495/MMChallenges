@@ -1,0 +1,46 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class JsonNodeToArraylist {
+    public static void main(String[] args) {
+        // Example JSON string
+        String jsonString = "{\"numbers\": [1, 2, 3, 4, 5]}";
+
+        try {
+            // Create ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Parse JSON string to JsonNode
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+            // Convert JsonNode to ArrayList
+            List<Integer> arrayList = convertJsonNodeToList(jsonNode);
+
+            // Print the ArrayList
+            System.out.println("ArrayList: " + arrayList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<Integer> convertJsonNodeToList(JsonNode jsonNode) {
+        List<Integer> list = new ArrayList<>();
+
+        // Check if the JsonNode is an array
+        if (jsonNode.isArray()) {
+            // Iterate through array elements
+            Iterator<JsonNode> elements = jsonNode.elements();
+            while (elements.hasNext()) {
+                JsonNode element = elements.next();
+                // Add the element to the ArrayList (assuming integers in this example)
+                list.add(element.asInt());
+            }
+        }
+
+        return list;
+    }
+}
