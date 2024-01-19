@@ -1,0 +1,18 @@
+Cloud computing encompasses various service models, commonly categorized into three main types:
+
+1. **Infrastructure as a Service (IaaS):**
+   - Provides virtualized computing resources over the internet.
+   - Users can rent virtual machines, storage, and networking components.
+   - Examples include Amazon EC2 and Microsoft Azure Virtual Machines.
+
+2. **Platform as a Service (PaaS):**
+   - Offers a platform that allows users to develop, run, and manage applications without dealing with the underlying infrastructure.
+   - Developers focus on coding, while the platform handles aspects like runtime, OS, and middleware.
+   - Examples include Google App Engine and Heroku.
+
+3. **Software as a Service (SaaS):**
+   - Delivers software applications over the internet on a subscription basis.
+   - Users access the software through a web browser without needing to install or maintain it locally.
+   - Examples include Salesforce, Google Workspace, and Microsoft 365.
+
+These models represent a spectrum of abstraction and management responsibility, allowing users to choose the level of control and customization that best suits their requirements.
