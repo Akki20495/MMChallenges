@@ -1,0 +1,13 @@
+@echo off
+setlocal
+
+set /p username="Enter your username: "
+set /p password="Enter your password: "
+
+powershell -Command "$password = ConvertTo-SecureString '%password%' -AsPlainText -Force; $cred = New-Object System.Management.Automation.PSCredential('%username%', $password);"
+
+REM Add your commands here. For example:
+echo Hello, %username%!
+
+endlocal
+pause
