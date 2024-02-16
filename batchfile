@@ -1,13 +1,28 @@
 @echo off
 setlocal
 
+:: Prompt for username
 set /p username="Enter your username: "
-set /p password="Enter your password: "
 
-powershell -Command "$password = ConvertTo-SecureString '%password%' -AsPlainText -Force; $cred = New-Object System.Management.Automation.PSCredential('%username%', $password);"
+:: Use PowerShell to hide password input
+set "psCommand=powershell -Command "$pword = read-host 'Enter your password' -AsSecureString; $BSTR=[System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword); [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)""
+for /f "usebackq delims=" %%p in (`%psCommand%`) do set password=%%p
 
-REM Add your commands here. For example:
-echo Hello, %username%!
+:: Your docker commands here
+echo Attempting to log in...
+docker login artifactory.awsmgmt.massmutual.com --username %username% --password %password%
+IF %ERRORLEVEL% NEQ 0 (
+    echo Login failed.
+    exit /b %ERRORLEVEL%
+)
 
-endlocal
+echo Login successful.
+echo Tagging the Docker image...
+docker tag coe_new_datacompy:latest1 artifactory.awsmgmt.massmutual.com/datacomgen-docker/coe_new_datacompy:latest1
+
+echo Pushing the Docker image...
+docker push artifactory.awsmgmt.massmutual.com/datacomgen-docker/coe_new_datacompy:latest1
+
+echo Script completed.
 pause
+endlocal
