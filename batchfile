@@ -1,0 +1,26 @@
+@echo off
+setlocal enabledelayedexpansion
+
+echo To Pull DataCogen Image please provide valid credentials (System- login Credentials)
+
+set /p username="Enter username: "
+
+:: Hide password input
+set "password="
+echo Enter password: 
+for /f "delims=" %%i in ('powershell -Command "$pword = read-host -AsSecureString; $BSTR=[System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword); [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)"') do set "password=%%i"
+
+echo Logging in to Docker with username %username%...
+echo %password%| docker login -u %username% --password-stdin
+if %errorlevel% neq 0 (
+    echo Failed to login to Docker.
+    echo Waiting for 5 seconds...
+    timeout /t 5 /nobreak >nul
+    exit /b %errorlevel%
+)
+
+echo Pulling hello-world image...
+docker pull hello-world
+
+:end
+endlocal
