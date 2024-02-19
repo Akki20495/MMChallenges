@@ -1,26 +1,27 @@
 @echo off
-setlocal enabledelayedexpansion
+SET IMAGE_NAME=hello-world
 
-echo To Pull DataCogen Image please provide valid credentials (System- login Credentials)
+docker images --format "{{.Repository}}" | findstr /B /C:"%IMAGE_NAME%" >nul 2>&1
 
-set /p username="Enter username: "
+IF %ERRORLEVEL% EQU 0 (
 
-:: Hide password input
-set "password="
-echo Enter password: 
-for /f "delims=" %%i in ('powershell -Command "$pword = read-host -AsSecureString; $BSTR=[System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword); [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)"') do set "password=%%i"
-
-echo Logging in to Docker with username %username%...
-echo %password%| docker login -u %username% --password-stdin
-if %errorlevel% neq 0 (
-    echo Failed to login to Docker.
-    echo Waiting for 5 seconds...
-    timeout /t 5 /nobreak >nul
-    exit /b %errorlevel%
+FOR /F "tokens=*" %%I IN ('docker ps -a --filter "ancestor=hello-world" --format "{{.ID}}"') DO (
+    docker rm -f %%I
 )
 
-echo Pulling hello-world image...
+FOR /F "tokens=*" %%I IN ('docker images hello-world --format "{{.ID}}"') DO SET IMAGE_ID=%%I
+docker image rm -f "%IMAGE_NAME%"
+)
+
+ELSE (
+
+    echo Image "%IMAGE_NAME%" does not exist.
+
+)
+
 docker pull hello-world
 
-:end
-endlocal
+docker run hello-world
+
+pause
+
