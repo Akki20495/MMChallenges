@@ -1,0 +1,41 @@
+const express = require('express');
+const sql = require('mssql');
+
+const app = express();
+
+// MSSQL database configuration
+const config = {
+  user: 'your_username',
+  password: 'your_password',
+  server: 'your_server',
+  database: 'your_database',
+  options: {
+    encrypt: true, // Use encryption
+    enableArithAbort: true // Enable ArithAbort
+  }
+};
+
+// Create a connection pool
+sql.connect(config).then(pool => {
+  console.log('Connected to MSSQL');
+
+  // Example route to query the database
+  app.get('/users', async (req, res) => {
+    try {
+      const result = await pool.request().query('SELECT * FROM Users');
+      res.json(result.recordset);
+    } catch (err) {
+      console.error('SQL error', err);
+      res.status(500).send('Server error');
+    }
+  });
+
+}).catch(err => {
+  console.error('Database connection failed:', err);
+});
+
+// Start the Express.js server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
