@@ -8,7 +8,7 @@ public class Main {
 
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
-            StringBuilder result = new StringBuilder();
+            JSONArray outputArray = new JSONArray();
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -18,16 +18,16 @@ public class Main {
                     JSONObject innerObj = innerArray.getJSONObject(j);
                     String status = innerObj.optString("Status", "");
                     String totalUnits = innerObj.optString("TotalUnits", "");
-                    result.append("{ Status: ").append(status).append(", TotalUnits: ").append(totalUnits).append("}, ");
+                    JSONObject formattedObj = new JSONObject();
+                    formattedObj.put("Status", status);
+                    if (!totalUnits.isEmpty()) {
+                        formattedObj.put("TotalUnits", totalUnits);
+                    }
+                    outputArray.put(formattedObj);
                 }
             }
 
-            // Remove the trailing comma and space
-            if (result.length() > 0) {
-                result.setLength(result.length() - 2);
-            }
-
-            System.out.println(result.toString());
+            System.out.println(outputArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
