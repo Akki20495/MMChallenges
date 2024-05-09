@@ -16,13 +16,9 @@ public class Main {
 
                 for (int j = 0; j < innerArray.length(); j++) {
                     JSONObject innerObj = innerArray.getJSONObject(j);
-                    innerObj.keys().forEachRemaining(key -> {
-                        try {
-                            result.append("{ \"").append(key).append("\": \"").append(innerObj.getString(key)).append("\"}, ");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    String status = innerObj.optString("Status", "");
+                    String totalUnits = innerObj.optString("TotalUnits", "");
+                    result.append("{ Status: ").append(status).append(", TotalUnits: ").append(totalUnits).append("}, ");
                 }
             }
 
