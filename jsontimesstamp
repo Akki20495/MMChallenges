@@ -8,6 +8,7 @@ public class Main {
 
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
+            JSONArray outputArray = new JSONArray();
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -25,9 +26,11 @@ public class Main {
                         }
                     });
 
-                    System.out.println(formattedObj.toString(4)); // Indent with 4 spaces
+                    outputArray.put(formattedObj);
                 }
             }
+
+            System.out.println(outputArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
