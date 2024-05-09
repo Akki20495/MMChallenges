@@ -51,3 +51,59 @@ public class XmlToJsonConverter {
         }
     }
 }
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class Main {
+    public static void main(String[] args) {
+        String filePath = "path_to_your_json_file.json";
+
+        try {
+            // Read the JSON data from the file
+            String jsonData = new String(Files.readAllBytes(Paths.get(filePath)));
+
+            // Split the JSON data into individual JSON objects
+            String[] jsonObjects = jsonData.split("(?<=\\})\\s*(?=\\{)");
+
+            JSONArray outputArray = new JSONArray();
+
+            // Process each JSON object
+            for (String jsonObject : jsonObjects) {
+                try {
+                    JSONObject obj = new JSONObject(jsonObject);
+                    JSONArray innerArray = obj.getJSONArray("Time_Off_Details_group");
+
+                    for (int j = 0; j < innerArray.length(); j++) {
+                        JSONObject innerObj = innerArray.getJSONObject(j);
+
+                        JSONObject formattedObj = new JSONObject();
+                        innerObj.keys().forEachRemaining(key -> {
+                            try {
+                                formattedObj.put(key, innerObj.get(key));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        outputArray.put(formattedObj);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.out.println(outputArray.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
