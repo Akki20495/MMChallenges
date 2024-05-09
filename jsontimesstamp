@@ -8,7 +8,6 @@ public class Main {
 
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
-            JSONArray outputArray = new JSONArray();
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -16,20 +15,22 @@ public class Main {
 
                 for (int j = 0; j < innerArray.length(); j++) {
                     JSONObject innerObj = innerArray.getJSONObject(j);
-                    String status = innerObj.optString("Status", "");
-                    String totalUnits = innerObj.optString("TotalUnits", "");
+
                     JSONObject formattedObj = new JSONObject();
-                    formattedObj.put("Status", status);
-                    if (!totalUnits.isEmpty()) {
-                        formattedObj.put("TotalUnits", totalUnits);
-                    }
-                    outputArray.put(formattedObj);
+                    innerObj.keys().forEachRemaining(key -> {
+                        try {
+                            formattedObj.put(key, innerObj.get(key));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+                    System.out.println(formattedObj.toString(4)); // Indent with 4 spaces
                 }
             }
-
-            System.out.println(outputArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
     }
 }
