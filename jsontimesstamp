@@ -37,3 +37,24 @@ public class Main {
 
     }
 }
+
+
+import json
+
+json_data = '[{"Time_Off_Details_group": [ {"Status": "value1", "TotalUnits":"am"}, {"Status": "value2", "TotalUnits":"am"}, {"Status2": "value3", "TotalUnits":"am"}]}, {"Time_Off_Details_group": [ {"Status": "value4"}, {"Status": "value5", "TotalUnits":"am"}, {"Status2": "value6"}]}]'
+
+try:
+    json_array = json.loads(json_data)
+    output_array = []
+
+    for obj in json_array:
+        inner_array = obj["Time_Off_Details_group"]
+        for inner_obj in inner_array:
+            formatted_obj = {}
+            for key in inner_obj.keys():
+                formatted_obj[key] = inner_obj[key]
+            output_array.append(formatted_obj)
+
+    print(json.dumps(output_array, indent=4))
+except json.JSONDecodeError as e:
+    print("Error decoding JSON:", e)
