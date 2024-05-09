@@ -2,6 +2,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class Main {
     public static void main(String[] args) {
         String jsonData = "[{\"Time_Off_Details_group\": [ {\"Status\": \"value1\", \"TotalUnits\":\"am\"}, {\"Status\": \"value2\", \"TotalUnits\":\"am\"}, {\"Status2\": \"value3\", \"TotalUnits\":\"am\"}]}, {\"Time_Off_Details_group\": [ {\"Status\": \"value4\"}, {\"Status\": \"value5\", \"TotalUnits\":\"am\"}, {\"Status2\": \"value6\"}]}]";
