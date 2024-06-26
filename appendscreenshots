@@ -1,0 +1,30 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Base64;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import com.aventstack.extentreports.Reporter;
+import io.cucumber.java.Scenario;
+
+public class HooksTest {
+    WebDriver idriver;
+
+    public void addScreenshot(Scenario scenario) throws Exception {
+        if (scenario.isFailed()) {
+            try {
+                // Take the screenshot
+                File sourcePath = ((TakesScreenshot) idriver).getScreenshotAs(OutputType.FILE);
+                byte[] fileContent = Files.readAllBytes(sourcePath.toPath());
+                String base64Screenshot = Base64.getEncoder().encodeToString(fileContent);
+
+                // Embed the base64 screenshot in the report
+                String base64Image = "data:image/png;base64," + base64Screenshot;
+                Reporter.addScreenCaptureFromPath(base64Image);
+            } catch (IOException e) {
+                System.out.println("The screenshot exception: " + e.toString());
+            }
+        }
+    }
+}
